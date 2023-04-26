@@ -1,4 +1,4 @@
-#include <Arduino.h>
+#include "Arduino.h"
 
 class MeuObjeto {
   private:
@@ -20,12 +20,25 @@ class MeuObjeto {
 class ObjetoSecundario {
   public:
     void meuMetodo(MeuObjeto& obj) {
-      int valor1 = obj.getParametro1(); // acessa o valor de parametro1
-      int valor2 = obj.getParametro2(); // acessa o valor de parametro2
+      valor1 = obj.getParametro1(); // acessa o valor de parametro1
+      valor2 = obj.getParametro2(); // acessa o valor de parametro2
       // faz algo com os valores
     }
+    int print() {
+      return valor1;
+    }
+  private:
+    int valor1;
+    int valor2;
 };
+MeuObjeto teste1(1, 2);
+ObjetoSecundario teste2;
 
 
-void setup() {}
-void loop() {}
+void setup() {
+  Serial.begin(9600);
+  Serial.print(teste2.print());
+}
+void loop() {
+
+}
