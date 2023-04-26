@@ -1,0 +1,31 @@
+#include <Arduino.h>
+
+class MeuObjeto {
+  private:
+    int parametro1;
+    int parametro2;
+  public:
+    MeuObjeto(int p1, int p2) {
+      parametro1 = p1;
+      parametro2 = p2;
+    }
+    int getParametro1() {
+      return parametro1;
+    }
+    int getParametro2() {
+      return parametro2;
+    }
+};
+
+class ObjetoSecundario {
+  public:
+    void meuMetodo(MeuObjeto& obj) {
+      int valor1 = obj.getParametro1(); // acessa o valor de parametro1
+      int valor2 = obj.getParametro2(); // acessa o valor de parametro2
+      // faz algo com os valores
+    }
+};
+
+
+void setup() {}
+void loop() {}

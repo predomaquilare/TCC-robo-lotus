@@ -13,6 +13,23 @@ class Motor {
   void PIDctrl(int pid);
   private:
   byte *pins;
+  //IRline valorsensores;
+  //int sensores = &IRline.getSensors();
+
+/*
+  void noventagrausdir() {
+    ledcWrite(3, 4095); // motor da esquerda
+    while((sensores &) {
+
+    }
+  }
+
+
+  void noventagrausesq() {
+    ledcWrite(1, 4095); // motor da direita
+  }
+  */
+  
 };
 
 Motor::Motor(byte *pubpins) {
@@ -97,6 +114,9 @@ public:
   void calibrateIR(int waittime = 5000);
   void showIR();
   int PID();
+  int getSensors() {
+      return valsensors;
+  }
 private:
   int mid[8];
   byte ci[16][3] = {
