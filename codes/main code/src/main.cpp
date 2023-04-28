@@ -13,24 +13,27 @@ class Motor {
   void PIDctrl(int pid);
   private:
   byte *pins;
-  //IRline valorsensores;
-  //int sensores = &IRline.getSensors();
+  
 
-/*
-  void noventagrausdir() {
-    ledcWrite(3, 4095); // motor da esquerda
-    while((sensores &) {
 
+  
+
+  
+};
+
+void noventagrausdir() {
+     // motor da esquerda
+    while((sensores & 0b0000010) == 0b00000010) {
+        ledcWrite(3, 4095);
     }
   }
 
 
   void noventagrausesq() {
-    ledcWrite(1, 4095); // motor da direita
+    while((sensores & 0b00100010) == 0b00000010) {
+        ledcWrite(1, 4095);
+    }
   }
-  */
-  
-};
 
 Motor::Motor(byte *pubpins) {
   pins = pubpins;
@@ -106,7 +109,7 @@ void Motor::PIDctrl(int pid) {
   Serial.println(pid);
   
 }
-
+int valsensors = 0;
 class IRline {
 public:
   IRline(byte *pubpins, byte pubnumIR, byte pubmuxpin = 0, bool pubmode = 1);
@@ -114,9 +117,7 @@ public:
   void calibrateIR(int waittime = 5000);
   void showIR();
   int PID();
-  int getSensors() {
-      return valsensors;
-  }
+  
 private:
   int mid[8];
   byte ci[16][3] = {
@@ -130,7 +131,7 @@ private:
     { 1, 1, 1 },
   };
   float error, lasterror;
-  int valsensors = 0;
+  
   bool mode;
   byte numIR;
   byte muxpin;
