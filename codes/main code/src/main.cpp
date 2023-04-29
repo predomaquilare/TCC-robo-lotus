@@ -2,17 +2,23 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+//#define Esp32
+//#define Arduino
+
 
 class Motor {
   public:
-  Motor(byte *pubpins);
+  Motor(byte *pubpins, byte sensores);
   void frente(int v = 4095);
   void esquerda(int v = 4095);
   void direita(int v = 4095);
   void speedctrl(int v = 4095);
   void PIDctrl(int pid);
+  void noventagrausesq();
+  void noventagrausdir();
   private:
   byte *pins;
+  byte valsensors;
   
 
 
@@ -21,47 +27,66 @@ class Motor {
   
 };
 
-void noventagrausdir() {
-     // motor da esquerda
-    while((sensores & 0b0000010) == 0b00000010) {
-        ledcWrite(3, 4095);
-    }
-  }
 
 
-  void noventagrausesq() {
-    while((sensores & 0b00100010) == 0b00000010) {
-        ledcWrite(1, 4095);
-    }
-  }
-
-Motor::Motor(byte *pubpins) {
+Motor::Motor(byte *pubpins, byte sensores) {
   pins = pubpins;
+  valsensors  = sensores;
   for(int i = 0; i < 4; i++) {
+    #ifdef Esp32
     ledcSetup(i+1, 5000, 12);
     ledcAttachPin(pins[i], i+1);
+    #endif
+    #ifdef Arduino
+      
+    #endif
   }
 }
 
 void Motor::frente(int v) {
+  #ifdef Esp32
   ledcWrite(1, v);
   ledcWrite(2, 0);
   ledcWrite(3, v);
   ledcWrite(4, 0);
+  #endif
+
+  #ifdef Arduino
+  digitalWrite(1, v);
+  digitalWrite(2, 0);
+  digitalWrite(3, v);
+  digitalWrite(4, 0);
+  #endif
 }
 
 void Motor::direita(int v) {
+
+
+  #ifdef Esp32
   ledcWrite(1, 0);
   ledcWrite(2, v);
   ledcWrite(3, v); // motor da esquerda
   ledcWrite(4, 0);
+   #endif
+
+  #ifdef Arduino
+      
+  #endif
+
+
 }
 
 void Motor::esquerda(int v) {
+  #ifdef Esp32
   ledcWrite(1, v); // motor da direita
   ledcWrite(2, 0);
   ledcWrite(3, 0);
   ledcWrite(4, v);
+  #endif
+
+  #ifdef Arduino
+      
+  #endif
 }
 
 void Motor::PIDctrl(int pid) {
@@ -70,33 +95,76 @@ void Motor::PIDctrl(int pid) {
   
   a = v + pid;
   b = v - pid;
+
+  #ifdef Esp32
   if(a > 4095) a = 4095;
   if(a < -4095) a = -4095;
   if(b < -4095) b = -4095;
   if(b > 4095) b = 4095;
-  
   ledcWrite(1, 0);
   ledcWrite(2, 0);
   ledcWrite(3, 0);
   ledcWrite(4, 0);
+  #endif
+
+  #ifdef Arduino
+  if(a > 1023) a = 1023;
+  if(a < -1023) a = -1023;
+  if(b < -1023) b = -1023;
+  if(b > 1023) b = 1023;
+  
+
+
+
+  #endif
+
   // IR meuir = IR(MUX = TRUE;ANALOG = FALSE)
   if(pid >= 0) { // vira para a direita
     
     if(b >= 0) {
+
+      #ifdef Esp32
       ledcWrite(1, b); //direita
       ledcWrite(3, a); //esquerda
+      #endif 
+
+      #ifdef Arduino
+      
+      #endif
+
     } else {
+
+      #ifdef Esp32
       ledcWrite(2, -b); //direita
       ledcWrite(3, a); //esquerda
+      #endif
+
+      #ifdef Arduino
+
+      #endif
+
     }
   } else {  // vira para esquerda
    
     if(a >= 0) {
+      #ifdef Esp32
       ledcWrite(1, b); //direita
       ledcWrite(3, a); //esquerda
+      #endif
+
+      #ifdef Arduino
+
+      #endif
+
     } else {
+      #ifdef Esp32
       ledcWrite(1, b); //direita
       ledcWrite(4, -a); //esquerda
+      #endif
+
+      #ifdef Arduino
+
+      #endif
     }
     
   }
@@ -109,17 +177,32 @@ void Motor::PIDctrl(int pid) {
   Serial.println(pid);
   
 }
-int valsensors = 0;
+
+void Motor::noventagrausdir() {
+    // motor da esquerda
+  while((valsensors & 0b0000010) == 0b00000010) {
+      ledcWrite(3, 4095);
+  }
+}
+
+
+void Motor::noventagrausesq() {
+  while((valsensors & 0b00100010) == 0b00000010) {
+      ledcWrite(1, 4095);
+  }
+}
+
+
 class IRline {
 public:
   IRline(byte *pubpins, byte pubnumIR, byte pubmuxpin = 0, bool pubmode = 1);
-  void updateIR(int debouncetime = 0);
+  byte updateIR(int debouncetime = 0);
   void calibrateIR(int waittime = 5000);
   void showIR();
   int PID();
-  
 private:
   int mid[8];
+  byte valsensors = 0;
   byte ci[16][3] = {
     { 0, 0, 0 },
     { 0, 0, 1 },
@@ -130,8 +213,8 @@ private:
     { 1, 1, 0 },
     { 1, 1, 1 },
   };
+  byte valsensors;
   float error, lasterror;
-  
   bool mode;
   byte numIR;
   byte muxpin;
@@ -157,10 +240,21 @@ IRline::IRline(byte *pubpins, byte pubnumIR, byte pubmuxpin, bool pubmode) {
   }
 }
 
+
+
 void IRline::calibrateIR(int waittime) {
+  #ifdef Esp32
+  int mins[numIR] = {4095,4095,4095,4095,4095,4095,4095,4095};
+  #endif
+  
+  #ifdef Arduino
+  int mins[numIR] = {1023,1023,1023,1023,1023,1023,1023,1023};
+  #endif 
+
   int calibratedvals[numIR]; 
   int maxs[numIR] = {0,0,0,0,0,0,0,0};
-  int mins[numIR] = {4095,4095,4095,4095,4095,4095,4095,4095};
+
+  
   while (millis() < waittime) {
     for (int i = 0; i < numIR; i++) {
       calibratedvals[i] = analogRead(pins[i]);
@@ -172,7 +266,7 @@ void IRline::calibrateIR(int waittime) {
   }
 }
 
-void IRline::updateIR(int debouncetime) {
+byte IRline::updateIR(int debouncetime) {
   valsensors = 0;
   if (mode == 1) {  // modo sem multiplexador
     if (millis() - pastmillis >= debouncetime) {
@@ -248,6 +342,7 @@ void IRline::updateIR(int debouncetime) {
       error = -7;
       break;
   }
+  return valsensors;
 }
 
 int IRline::PID() {
@@ -282,7 +377,7 @@ byte pinos[8] = { 13, 12, 14, 27, 26, 25, 33, 32 };
 
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 IRline ir(pinos, 8);
-Motor motor(m);
+Motor motor(m, ir.updateIR);
 
 void setup() {
   Serial.begin(115200);
