@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "teste objs": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
