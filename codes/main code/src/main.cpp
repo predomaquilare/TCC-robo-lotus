@@ -214,6 +214,7 @@ void Motor::PIDctrl(float pid) {
       }
     }
   }
+  Serial.println(pid);
 }
 /*
 void Motor::noventagrausdir() {
@@ -234,10 +235,10 @@ void Motor::noventagrausesq() {
 class IRline {
 public:
   IRline(byte *pubpins, byte pubnumIR, byte pubmuxpin = 0, bool pubmode = 1);
-  byte updateIR(int debouncetime = 0);
+  float updateIR(int debouncetime = 0);
   void calibrateIR(int waittime = 5000);
   void showIR();
-  int PID();
+  float PID();
 private:
   int mid[8];
   byte valsensors;
@@ -254,7 +255,7 @@ private:
 
   float error, lasterror;
   bool mode;
-  byte numIR;
+  int numIR;
   byte muxpin;
   byte *pins;
   unsigned long pastmillis = 0;
@@ -304,7 +305,7 @@ void IRline::calibrateIR(int waittime) {
   }
 }
 
-byte IRline::updateIR(int debouncetime) {
+float IRline::updateIR(int debouncetime) {
   valsensors = 0;
   if (mode == 1) {  // modo sem multiplexador
     if (millis() - pastmillis >= debouncetime) {
@@ -331,12 +332,11 @@ byte IRline::updateIR(int debouncetime) {
   }
 */
 
-  switch (valsensors) {
-    if(numIR == 8) {
+  if(numIR == 8) {
+    switch (valsensors) {
       default:
         error = lasterror;
         break;
-
       case 0b10000000:
         error = 7;
         break;
@@ -397,44 +397,67 @@ byte IRline::updateIR(int debouncetime) {
         error = -7;
         break;
 
-      case (0b11110000 || 0b11111000):
+      case 0b11110000:
         error = 0.1;
         break;
 
-      case (0b00001111 || 0b00011111):
+      case 0b11111000:
+        error = 0.1;
+        break;
+
+
+      case 0b00001111:
         error = -0.1;
         break;  
+    
+      case 0b00011111:
+        error = -0.1;
+        break; 
     }
-    else if(numIR == 5) {
-      default:
-        error = lasterror;
-        break;
-      case: 0b10000:
+  }
+
+
+  else if(numIR == 5) {
+    switch (valsensors) {
+     
+      case 0b10000:
         error = 2;
         break;
 
-      case: 0b01000:
+      case 0b01000:
         error = 1;
         break;
 
-      case: 0b00100:
+      case 0b00100:
         error = 0;
         break;
 
-      case: 0b00010:
+      case 0b00010:
         error = -1;
         break;
 
-      case: 0b00001:
+      case 0b00001:
         error = -2;
         break;
 
-      case (0b11000 || 0b11100):
+      case 0b11000:
         error = 0.1;
         break;
 
-      case (0b00011 || 0b00111):
+      case 0b11100:
+        error = 0.1;
+        break;
+
+      case 0b00011:
         error = -0.1;
+        break;
+
+      case 0b00111:
+        error = -0.1;
+        break;
+
+      default:
+        error = lasterror;
         break;
     }
   }
@@ -502,7 +525,7 @@ void setup() {
 
 void loop() {
   ir.updateIR();
-  motor.PIDctrl(ir.PID(), ir.updateIR());
+  motor.PIDctrl(ir.PID()/* ir.updateIR()*/);
   int val = 0;
   for(int i = 0; i < 100; i++) {
     val = analogRead(35) + val;
