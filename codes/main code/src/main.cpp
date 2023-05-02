@@ -4,7 +4,7 @@
 #include <Adafruit_SSD1306.h>
 
 
-//#define Esp32
+#define Esp32
 //#define Arduino
 
 
@@ -105,8 +105,7 @@ void Motor::PIDctrl(float pid) {
   
 
   int a = 0,b = 0;
-  a = v + pid;
-  b = v - pid;
+  
 
   #ifdef Esp32
   int v = 4095*0.6;
@@ -123,6 +122,9 @@ void Motor::PIDctrl(float pid) {
   if(b < -1023) b = -1023;
   if(b > 1023) b = 1023;
   #endif
+
+  a = v + pid;
+  b = v - pid;
 
   if(pid == 0.1) {
     //90 graus esq
@@ -213,7 +215,7 @@ void Motor::PIDctrl(float pid) {
     }
   }
 }
-
+/*
 void Motor::noventagrausdir() {
     // motor da esquerda
   while((valsensors & 0b0000010) == 0b00000010) {
@@ -227,7 +229,7 @@ void Motor::noventagrausesq() {
       ledcWrite(1, 4095);
   }
 }
-
+*/
 
 class IRline {
 public:
@@ -238,7 +240,7 @@ public:
   int PID();
 private:
   int mid[8];
-  byte valsensors = 0;
+  byte valsensors;
   byte ci[16][3] = {
     { 0, 0, 0 },
     { 0, 0, 1 },
@@ -249,7 +251,7 @@ private:
     { 1, 1, 0 },
     { 1, 1, 1 },
   };
-  byte valsensors;
+
   float error, lasterror;
   bool mode;
   byte numIR;
@@ -328,6 +330,7 @@ byte IRline::updateIR(int debouncetime) {
     }
   }
 */
+
   switch (valsensors) {
     if(numIR == 8) {
       default:
@@ -394,11 +397,11 @@ byte IRline::updateIR(int debouncetime) {
         error = -7;
         break;
 
-      case (0b11110000 || 0b11111000)
+      case (0b11110000 || 0b11111000):
         error = 0.1;
         break;
 
-      case (0b00001111 || 0b00011111)
+      case (0b00001111 || 0b00011111):
         error = -0.1;
         break;  
     }
@@ -406,31 +409,31 @@ byte IRline::updateIR(int debouncetime) {
       default:
         error = lasterror;
         break;
-      case: 0b10000
+      case: 0b10000:
         error = 2;
         break;
 
-      case: 0b01000
+      case: 0b01000:
         error = 1;
         break;
 
-      case: 0b00100
+      case: 0b00100:
         error = 0;
         break;
 
-      case: 0b00010
+      case: 0b00010:
         error = -1;
         break;
 
-      case: 0b00001
+      case: 0b00001:
         error = -2;
         break;
 
-      case (0b11000 || 0b11100)
+      case (0b11000 || 0b11100):
         error = 0.1;
         break;
 
-      case (0b00011 || 0b00111)
+      case (0b00011 || 0b00111):
         error = -0.1;
         break;
     }
