@@ -106,19 +106,19 @@ float IRline::getPlusUpdateIR(int debouncetime) {
   if (numIR == 8) {
     switch (valsensors) {
       case 0b10000000:
-        error = 4;
+        error = 8;
         break;
 
       case 0b11000000:
-        error = 3.5;
+        error = 4;
         break;
 
       case 0b01000000:
-        error = 3;
+        error = 4;
         break;
 
       case 0b01100000:
-        error = 2.5;
+        error = 3;
         break;
 
       case 0b00100000:
@@ -126,11 +126,11 @@ float IRline::getPlusUpdateIR(int debouncetime) {
         break;
 
       case 0b00110000:
-        error = 1.5;
+        error = 1;
         break;
 
       case 0b00010000:
-        error = 1;
+        error = 0;
         break;
 
       case 0b00011000:
@@ -138,11 +138,11 @@ float IRline::getPlusUpdateIR(int debouncetime) {
         break;
 
       case 0b00001000:
-        error = 1;
+        error = 0;
         break;
 
       case 0b00001100:
-        error = -1.5;
+        error = -1;
         break;
 
       case 0b00000100:
@@ -150,7 +150,7 @@ float IRline::getPlusUpdateIR(int debouncetime) {
         break;
 
       case 0b00000110:
-        error = -2.5;
+        error = -2;
         break;
 
       case 0b00000010:
@@ -158,11 +158,11 @@ float IRline::getPlusUpdateIR(int debouncetime) {
         break;
 
       case 0b00000011:
-        error = -3.5;
+        error = -4;
         break;
 
       case 0b00000001:
-        error = -4;
+        error = -8;
         break;
 
       default:
@@ -346,7 +346,8 @@ void Motor::esquerda(int v) {
 void Motor::PIDctrl(float pid, byte sensors) {
   float constant = 0.8;
   valsensores = sensors;
-
+  #define direita 2
+  #define esquerda 1
 #ifdef Esp32
   int v = 4095 * constant;
 #endif
@@ -379,8 +380,8 @@ void Motor::PIDctrl(float pid, byte sensors) {
     if (pid > 0) { // vira para a direita
       if (b > 0) {
 #ifdef Esp32
-        ledcWrite(1, a);
-        ledcWrite(2, b);
+        ledcWrite(esquerda, a);
+        ledcWrite(direita, b);
         digitalWrite(pins[0], 0);
         digitalWrite(pins[1], 0);
         digitalWrite(pins[2], 1);
@@ -399,8 +400,8 @@ void Motor::PIDctrl(float pid, byte sensors) {
       } else {
 
 #ifdef Esp32
-        ledcWrite(1, a);
-        ledcWrite(2, -b);
+        ledcWrite(esquerda, a);
+        ledcWrite(direita, -b);
         digitalWrite(pins[0], 1);
         digitalWrite(pins[1], 0);
         digitalWrite(pins[2], 1);
@@ -420,8 +421,8 @@ void Motor::PIDctrl(float pid, byte sensors) {
     } else if (pid < 0) { // vira para esquerda
       if (a > 0) {
 #ifdef Esp32
-        ledcWrite(1, a);
-        ledcWrite(2, b);
+        ledcWrite(esquerda, a);
+        ledcWrite(direita, b);
         digitalWrite(pins[0], 0);
         digitalWrite(pins[1], 1);
         digitalWrite(pins[2], 0);
@@ -439,8 +440,8 @@ void Motor::PIDctrl(float pid, byte sensors) {
 
       } else {
 #ifdef Esp32
-        ledcWrite(1, -a);
-        ledcWrite(2, b);
+        ledcWrite(esquerda, -a);
+        ledcWrite(direita, b);
         digitalWrite(pins[0], 0);
         digitalWrite(pins[1], 1);
         digitalWrite(pins[2], 0);
@@ -458,8 +459,8 @@ void Motor::PIDctrl(float pid, byte sensors) {
       }
     } else if (pid == 0) {
 #ifdef Esp32
-      ledcWrite(1, a);
-      ledcWrite(2, b);
+      ledcWrite(esquerda, a);
+      ledcWrite(direita, b);
       digitalWrite(pins[0], 0);
       digitalWrite(pins[1], 1);
       digitalWrite(pins[2], 1);
@@ -493,7 +494,6 @@ void Motor::PIDctrl(float pid, byte sensors) {
   23 - pwm direita
 */
 void pidoled();
-void showK();
 void oledstart();
 
 byte pinos[8] = { 13, 12, 14, 27, 26, 25, 33, 32 };
@@ -518,7 +518,9 @@ void loop() {
   ir.getPlusUpdateIR();
   motor.PIDctrl(ir.PID(), ir.getPlusUpdateIR());
   Serial.print("    ");
-  Serial.println(ir.PID());
+  Serial.print(ir.PID());
+  Serial.print("    ");
+  Serial.println(ir.getPlusUpdateIR(), BIN);
   //ir.showIR();
   pidoled();
 }
