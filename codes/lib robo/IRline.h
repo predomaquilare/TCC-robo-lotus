@@ -11,7 +11,7 @@ class IRline {
     void showIR();
     float PID();
   private:
-    int ci[16][3] = {
+    uint8_t ci[16][3] = {
       { 0, 0, 0 },
       { 0, 0, 1 },
       { 0, 1, 0 },
