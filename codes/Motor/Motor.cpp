@@ -131,7 +131,7 @@ void Motor::PIDctrl(float pid, uint8_t sensors) {
     if (pid > 0) { // vira para a direita
       if (b > 0) {
 #ifdef Esp32
-        ledcWrite(esquerda, a);
+        ledcWrite(esquerda, v);
         ledcWrite(direita, b);
         digitalWrite(pins[0], 0);
         digitalWrite(pins[1], 0);
@@ -151,7 +151,7 @@ void Motor::PIDctrl(float pid, uint8_t sensors) {
       } else {
 
 #ifdef Esp32
-        ledcWrite(esquerda, a);
+        ledcWrite(esquerda, v);
         ledcWrite(direita, -b);
         digitalWrite(pins[0], 1);
         digitalWrite(pins[1], 0);
@@ -160,7 +160,7 @@ void Motor::PIDctrl(float pid, uint8_t sensors) {
 #endif
 
 #ifdef Arduino
-        analogWrite(pins[4], a);
+        analogWrite(pins[4], v);
         analogWrite(pins[5], -b);
         digitalWrite(pins[0], 1);
         digitalWrite(pins[1], 0);
@@ -173,7 +173,7 @@ void Motor::PIDctrl(float pid, uint8_t sensors) {
       if (a > 0) {
 #ifdef Esp32
         ledcWrite(esquerda, a);
-        ledcWrite(direita, b);
+        ledcWrite(direita, v);
         digitalWrite(pins[0], 0);
         digitalWrite(pins[1], 1);
         digitalWrite(pins[2], 0);
@@ -192,7 +192,7 @@ void Motor::PIDctrl(float pid, uint8_t sensors) {
       } else {
 #ifdef Esp32
         ledcWrite(esquerda, -a);
-        ledcWrite(direita, b);
+        ledcWrite(direita, v);
         digitalWrite(pins[0], 0);
         digitalWrite(pins[1], 1);
         digitalWrite(pins[2], 0);
@@ -210,8 +210,8 @@ void Motor::PIDctrl(float pid, uint8_t sensors) {
       }
     } else if (pid == 0) {
 #ifdef Esp32
-      ledcWrite(esquerda, a);
-      ledcWrite(direita, b);
+      ledcWrite(esquerda, v);
+      ledcWrite(direita, v);
       digitalWrite(pins[0], 0);
       digitalWrite(pins[1], 1);
       digitalWrite(pins[2], 1);
