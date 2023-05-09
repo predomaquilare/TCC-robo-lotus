@@ -16,8 +16,3 @@ getPlusUpdateIR	KEYWORD2
 getError	KEYWORD2
 getIR	KEYWORD2
 PID	KEYWORD2
-
-######################################
-# Constants (LITERAL1)
-#######################################
-KEY_NONE	LITERAL1
