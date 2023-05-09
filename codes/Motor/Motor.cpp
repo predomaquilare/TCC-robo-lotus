@@ -1,8 +1,8 @@
 #include "Motor.h"
 
-Motor::Motor(byte *pubpins) {
+Motor::Motor(uint8_t *pubpins) {
   pins = pubpins;
-  for (int i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < 4; i++) {
 
 #ifdef Esp32
     pinMode(pins[i], OUTPUT);
@@ -18,9 +18,25 @@ Motor::Motor(byte *pubpins) {
   }
 }
 
+void Motor::noventagrausesq() {
+    unsigned long currentMillis = millis();
+    frente(4095 / 2);
+    while (millis() - previousMillis < 1000) {}
+    while ((valsensores & 0b00000110) == 0b00000110) {
+        esquerda();
+    }
+}
 
+void Motor::noventagrausdir() {
+    unsigned long currentMillis = millis();
+    frente(4095 / 2);
+    while (millis() - previousMillis < 1000) {}
+    while ((valsensores & 0b01100000) == 0b01100000) {
+        direita();
+    }
+}
 
-void Motor::frente(int v) {
+void Motor::frente(uint16_t v) {
 #ifdef Esp32
   ledcWrite(1, v);
   ledcWrite(2, v);
@@ -38,7 +54,7 @@ void Motor::frente(int v) {
 #endif
 }
 
-void Motor::direita(int v) {
+void Motor::direita(uint16_t v) {
 
 
 #ifdef Esp32
@@ -60,7 +76,7 @@ void Motor::direita(int v) {
 
 }
 
-void Motor::esquerda(int v) {
+void Motor::esquerda(uint16_t v) {
 #ifdef Esp32
   ledcWrite(1, v);
   ledcWrite(2, v);
@@ -78,21 +94,21 @@ void Motor::esquerda(int v) {
 #endif
 }
 
-void Motor::PIDctrl(float pid, byte sensors) {
+void Motor::PIDctrl(float pid, uint8_t sensors) {
   float constant = 0.8;
   valsensores = sensors;
   #define direita 2
   #define esquerda 1
 #ifdef Esp32
-  int v = 4095 * constant;
+  uint16_t v = 4095 * constant;
 #endif
 
 #ifdef Arduino
-  int v = 1023 * constant;
+  uint16_t v = 1023 * constant;
 #endif
 
 
-  int a = 0, b = 0;
+  uint16_t a = 0, b = 0;
   a = v + pid;
   b = v - pid;
 
