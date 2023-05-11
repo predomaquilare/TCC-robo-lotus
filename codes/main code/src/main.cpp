@@ -8,7 +8,6 @@
 #define OLED
 #define Esp32
 //#define Arduino
-
 //#define TestIR
 
 void pidoled();
