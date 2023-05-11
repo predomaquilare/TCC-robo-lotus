@@ -1,0 +1,19 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Motor	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+frente	KEYWORD2
+esquerda	KEYWORD2
+direita	KEYWORD2
+PIDctrl	KEYWORD2
+noventagrausdir	KEYWORD2
+noventagrausesq	KEYWORD2
